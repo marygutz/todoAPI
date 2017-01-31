@@ -57,9 +57,20 @@ app.post('/todos', function (req, res) {
   // push body into array
   todos.push(body)
 
-  req.body
-  //
   res.json(body)
+})
+
+// DELETE
+app.delete('/todos/:id', function (req, res) {
+  var todoId = parseInt(req.params.id, 10)
+  var matched = _.findWhere(todos, {id: todoId})
+
+  	if (matched) {
+    	todos = _.without(todos, matched)
+    	res.json(matched)
+  	} else {
+  		res.status(404).send()
+  	}
 })
 
 app.listen(PORT, function () {
