@@ -27,6 +27,16 @@ app.get('/todos', function (req, res) {
   	filteredTodos = _.where(filteredTodos, {completed: false})
   }
 
+  // q > 0
+  // use indexOf to search for string of queryParam
+  // "bla bla bla".indexOv('work')
+  // returns -1 if not exist, or pos in str. if > -1, add to filtered todos
+  if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
+  	filteredTodos = _.filter(filteredTodos, function (todo) {
+  		return todo.description.tolowercase.indexOf(queryParams.q.tolowercase.) > -1
+  	})
+  }
+
   res.json(filteredTodos)
 })
 
