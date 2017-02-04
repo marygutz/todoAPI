@@ -16,6 +16,7 @@ app.get('/', function (req, res) {
 })
 
 // GET list of todos
+// /todos?completed=true&q=house
 app.get('/todos', function (req, res) {
   // access queryParams
   var queryParams = req.query
@@ -29,11 +30,35 @@ app.get('/todos', function (req, res) {
 
   // q > 0
   // use indexOf to search for string of queryParam
-  // "bla bla bla".indexOv('work')
+  // "bla bla bla".indexOf('work')
   // returns -1 if not exist, or pos in str. if > -1, add to filtered todos
   if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
   	filteredTodos = _.filter(filteredTodos, function (todo) {
-  		return todo.description.tolowercase.indexOf(queryParams.q.tolowercase.) > -1
+  		// console.log(queryParams.q.toLowerCase())
+  		var query = queryParams.q.toLowerCase()
+  		console.log(query)
+  		return todo.description.toLowerCase().indexOf(query) > -1
+  		// wtf is all this?
+  		// todo - the foreach each
+  		// description - ?
+  		// tolowercase - strtolower
+  		//
+  		// indexOf - Returns the index at which value can be found in the array,
+  		// or -1 if value is not present in the array. If you're working with a large array,
+  		// and you know that the array is already sorted, pass true for isSorted to use a faster binary search ...
+  		// or, pass a number as the third argument in order to look for the first matching value in the array
+  		// after the given index.
+  		//
+  		// .filter Looks through each value in the list,
+  		// returning an array of all the values that pass a truth test (predicate).
+  		//
+  		// (queryParams.q.tolowercase)
+  		// queryParmas var req.query
+  		// q - the query param
+  		// tolowercase - strtolower
+  		// > -1 if indexOf is > -1
+  		// then return this.
+  		//
   	})
   }
 
