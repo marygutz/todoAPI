@@ -79,13 +79,24 @@ app.get('/todos/:id', function (req, res) {
   // 		}
   // })
   // instead, use underscore:
-  var matched = _.findWhere(todos, {id: todoId})
+  // var matched = _.findWhere(todos, {id: todoId})
+// if (matched) {
+//  	res.json(matched)
+// } else {
+// 	res.status(404).send()
+// }
+//
+// instead, use sql obj
 
-  	if (matched) {
-    	res.json(matched)
+  db.todo.findById(todoId).then(function (todo) {
+  	if (todo) {
+  		res.json(todo)
   	} else {
   		res.status(404).send()
   	}
+  }, function (e) {
+  	res.status(500).json(e)
+  })
 })
 
 app.post('/todos', function (req, res) {
