@@ -80,7 +80,6 @@ app.get('/todos', function (req, res) {
   		$like: '%' + queryParams.q + '%'
   	}
   }
-  console.log(where)
   db.todo.findAll({where: where}).then(function (todos) {
   	res.json(todos)
   }, function (e) {
@@ -165,14 +164,22 @@ app.post('/todos', function (req, res) {
 // DELETE
 app.delete('/todos/:id', function (req, res) {
   var todoId = parseInt(req.params.id, 10)
-  var matched = _.findWhere(todos, {id: todoId})
-
-  	if (matched) {
-    	todos = _.without(todos, matched)
-    	res.json(matched)
+  // var matched = _.findWhere(todos, {id: todoId})
+  db.todo.destroy({
+    where: {
+      id: todoId
+    }
+  }).then(function (rowsDeleted) {
+  	if (rowsDeleted === 0) {
+  		res.status(404).json({
+  			error: 'todo not found by that id'
+  		})
   	} else {
-  		res.status(404).send()
+  		res.status(204).send()
   	}
+  }, function () {
+  	res.status(500).send()
+  })
 })
 
 // PUT
