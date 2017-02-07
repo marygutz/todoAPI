@@ -9,6 +9,7 @@
   "author": "Mary Licanin",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.0",
     "body-parser": "^1.16.0",
     "express": "^4.14.1",
     "pg": "^4.4.1",
