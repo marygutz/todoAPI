@@ -21,51 +21,73 @@ app.get('/', function (req, res) {
 app.get('/todos', function (req, res) {
   // access queryParams
   var queryParams = req.query
-  var filteredTodos = todos
+  // var filteredTodos = todos
+  var where = {}
 
-  if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
-  	filteredTodos = _.where(filteredTodos, {completed: true})
-  } else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
-  	filteredTodos = _.where(filteredTodos, {completed: false})
-  }
+  // if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
+  // 	filteredTodos = _.where(filteredTodos, {completed: true})
+  // } else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
+  // 	filteredTodos = _.where(filteredTodos, {completed: false})
+  // }
 
   // q > 0
   // use indexOf to search for string of queryParam
   // "bla bla bla".indexOf('work')
   // returns -1 if not exist, or pos in str. if > -1, add to filtered todos
-  if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
-  	filteredTodos = _.filter(filteredTodos, function (todo) {
-  		// console.log(queryParams.q.toLowerCase())
-  		var query = queryParams.q.toLowerCase()
-  		console.log(query)
-  		return todo.description.toLowerCase().indexOf(query) > -1
-  		// wtf is all this?
-  		// todo - the foreach each
-  		// description - ?
-  		// tolowercase - strtolower
-  		//
-  		// indexOf - Returns the index at which value can be found in the array,
-  		// or -1 if value is not present in the array. If you're working with a large array,
-  		// and you know that the array is already sorted,
-  		// pass true for isSorted to use a faster binary search ...
-  		// or, pass a number as the third argument in order to look for
-  		// the first matching value in the array
-  		// after the given index.
-  		//
-  		// .filter Looks through each value in the list,
-  		// returning an array of all the values that pass a truth test (predicate).
-  		//
-  		// (queryParams.q.tolowercase)
-  		// queryParmas var req.query
-  		// q - the query param
-  		// tolowercase - strtolower
-  		// > -1 if indexOf is > -1
-  		// then return this.
-  		//
-  	})
+  // if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
+  // 	filteredTodos = _.filter(filteredTodos, function (todo) {
+  // 		// console.log(queryParams.q.toLowerCase())
+  // 		var query = queryParams.q.toLowerCase()
+  // 		console.log(query)
+  // 		return todo.description.toLowerCase().indexOf(query) > -1
+  // 		// wtf is all this?
+  // 		// todo - the foreach each
+  // 		// description - ?
+  // 		// tolowercase - strtolower
+  // 		//
+  // 		// indexOf - Returns the index at which value can be found in the array,
+  // 		// or -1 if value is not present in the array. If you're working with a large array,
+  // 		// and you know that the array is already sorted,
+  // 		// pass true for isSorted to use a faster binary search ...
+  // 		// or, pass a number as the third argument in order to look for
+  // 		// the first matching value in the array
+  // 		// after the given index.
+  // 		//
+  // 		// .filter Looks through each value in the list,
+  // 		// returning an array of all the values that pass a truth test (predicate).
+  // 		//
+  // 		// (queryParams.q.tolowercase)
+  // 		// queryParmas var req.query
+  // 		// q - the query param
+  // 		// tolowercase - strtolower
+  // 		// > -1 if indexOf is > -1
+  // 		// then return this.
+  // 		//
+  // 	})
+  // }
+
+  // sequelize:
+  // use findall and pass a where clause
+
+  if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
+  	where.completed = true
+  } else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
+  	where.completed = false
   }
 
-  res.json(filteredTodos)
+  if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
+  	where.description = {
+  		$like: '%' + queryParams.q + '%'
+  	}
+  }
+  console.log(where)
+  db.todo.findAll({where: where}).then(function (todos) {
+  	res.json(todos)
+  }, function (e) {
+  	res.status(500).send()
+  })
+
+  // res.json(filteredTodos)
 })
 
 // GET list of todos
@@ -95,7 +117,7 @@ app.get('/todos/:id', function (req, res) {
   		res.status(404).send()
   	}
   }, function (e) {
-  	res.status(500).json(e)
+  	res.status(500).send()
   })
 })
 
