@@ -1,6 +1,7 @@
 var express = require('express')
 var bodyParser = require('body-parser')
 var _ = require('underscore')
+var db = require('./db.js')
 
 var app = express()
 var PORT = process.env.PORT || 3000
@@ -45,8 +46,10 @@ app.get('/todos', function (req, res) {
   		//
   		// indexOf - Returns the index at which value can be found in the array,
   		// or -1 if value is not present in the array. If you're working with a large array,
-  		// and you know that the array is already sorted, pass true for isSorted to use a faster binary search ...
-  		// or, pass a number as the third argument in order to look for the first matching value in the array
+  		// and you know that the array is already sorted,
+  		// pass true for isSorted to use a faster binary search ...
+  		// or, pass a number as the third argument in order to look for
+  		// the first matching value in the array
   		// after the given index.
   		//
   		// .filter Looks through each value in the list,
@@ -88,21 +91,42 @@ app.get('/todos/:id', function (req, res) {
 app.post('/todos', function (req, res) {
   var body = _.pick(req.body, 'description', 'completed')
 
-  if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
-  	return res.status(400).send()
-  }
+  db.todo.create(body).then(function (todo) {
+  	res.json(todo)
+  }, function (e) {
+  	res.status(400).json(e)
+  })
+  // if (body.description) {
+  // // sequelize.define('todo', {...
+  //   db.todo.create({
+  // 		description: body.description
+  //   })
+  //   todos.push(body)
+  //   res.json(body)
+  // } else {
+  //   res.status(400).json(e).send
+  // }
 
-  // set body.description to be trimmed value
-  body.description = body.description.trim()
+// res with 200 and value .toJSON
+// else pass e and pass to res.toJSON(e)
+//
+  // if (!_.isBoolean(body.completed)
+  // || !_.isString(body.description)
+  // || body.description.trim().length === 0) {
+  // 	return res.status(400).send()
+  // }
 
-  // add id field
-  body.id = todoNextId
-  todoNextId++
+  // // set body.description to be trimmed value
+  // body.description = body.description.trim()
 
-  // push body into array
-  todos.push(body)
+  // // add id field
+  // body.id = todoNextId
+  // todoNextId++
 
-  res.json(body)
+  // // push body into array
+  // todos.push(body)
+
+  // res.json(body)
 })
 
 // DELETE
@@ -129,13 +153,16 @@ app.put('/todos/:id', function (req, res) {
   	return status(404).send()
   }
 
-  if (body.hasOwnProperty('completed') && _.isBoolean(body.completed)) {
+  if (body.hasOwnProperty('completed')
+  	&& _.isBoolean(body.completed)) {
   	validAttributes.completed = body.completed
   } else if (body.hasOwnProperty('completed')) {
   	return res.status(400).send()
   }
 
-  if (body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0) {
+  if (body.hasOwnProperty('description')
+  	&& _.isString(body.description)
+  	&& body.description.trim().length > 0) {
   	validAttributes.description = body.description
   } else if (body.hasOwnProperty('description')) {
   	return res.status(400).send()
@@ -145,6 +172,10 @@ app.put('/todos/:id', function (req, res) {
   res.json(matched)
 })
 
-app.listen(PORT, function () {
-  console.log('express listening on port ' + PORT + '!')
+db.sequelize.sync().then(function () {
+	// start server
+  app.listen(PORT, function () {
+    console.log('express listening on port ' + PORT + '!')
+  })
 })
+
