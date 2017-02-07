@@ -23,5 +23,5 @@ db.todo = sequelize.import(__dirname + '/models/todo.js')
 db.sequelize = sequelize
 // library
 // db.Sequelize = Sequelize
-
+db.user = sequelize.import(__dirname + '/models/user.js')
 module.exports = db
