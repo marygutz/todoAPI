@@ -24,4 +24,10 @@ db.sequelize = sequelize
 // library
 // db.Sequelize = Sequelize
 db.user = sequelize.import(__dirname + '/models/user.js')
+
+// call sequelize belongsTo and hasMany methods
+// belongsTo(takes model todo belongs to)
+db.todo.belongsTo(db.user)
+db.user.hasMany(db.todo)
+
 module.exports = db
