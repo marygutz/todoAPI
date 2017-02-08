@@ -63,6 +63,29 @@ module.exports = function (sequelize, DataTypes) {
 				  		reject()
 				  })
   				})
+  			},
+  			findByToken: function (token) {
+  				return new Promise(function (resolve, reject) {
+  					try {
+  						// decode token
+  						var decodedJWT = jwt.verify(token, 'qwerty098')
+						// decrypt data
+					    var bytes = cryptojs.AES.decrypt(decodedJWT.token, 'asd48@8;')
+					    var tokenData = JSON.parse(bytes.toString(cryptojs.enc.Utf8))
+
+					    user.findById(tokenData.id).then(function (user) {
+					      if (user) {
+					        resolve(user)
+					      } else {
+					        reject()  // id doesnt exist in db
+					      }
+					    }, function (e) {
+					      reject() // findbyid fails, maybe db problem
+					    })
+	  				} catch (e) {
+	  					reject()// token isnt valid format
+	  				}
+  				})
   			}
   		},
   		instanceMethods: {
@@ -78,7 +101,7 @@ module.exports = function (sequelize, DataTypes) {
   				try {
   					// encrypt info using id & type
   					var stringData = JSON.stringify({id: this.get('id'), type: type})
-  					var encryptedData = cryptojs.AES.encrypt(stringData, 'abc123!@!').toString()
+  					var encryptedData = cryptojs.AES.encrypt(stringData, 'asd48@8;').toString()
   					// create new json web token
   					var token = jwt.sign({
   						token: encryptedData
